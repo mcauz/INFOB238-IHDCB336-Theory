@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>CSS Margin</title>
+        <style>
+            div {
+                background-color: aliceblue;
+                border: 1px solid blue;
+            }
+            .bb {
+                box-sizing: border-box;
+                width: 400px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Box-sizing = content-box</h1>
+        <div>
+            <p>Container 1: no margin, no padding</p>
+        </div>
+        <div style="margin: 10px">
+            <p>Container 2: margin, no padding</p>
+        </div>
+        <div style="margin: 10px;padding: 10px">
+            <p>Container 3: margin, padding</p>
+        </div>
+        <div style="padding: 10px">
+            <p>Container 4: no margin, padding</p>
+        </div>
+        <h1>Box-sizing = border-box</h1>
+        <div class="bb">
+            <p>Container 1: no margin, no padding</p>
+        </div>
+        <div class="bb" style="margin: 10px">
+            <p>Container 2: margin, no padding</p>
+        </div>
+        <div class="bb" style="margin: 10px;padding: 10px">
+            <p>Container 3: margin, padding</p>
+        </div>
+        <div class="bb" style="padding: 10px">
+            <p>Container 4: no margin, padding</p>
+        </div>
+    </body>
+</html>
