@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        body {
+            padding: 50px;
+        }
+
+        div {
+            background-color: blue;
+            width: 400px;
+            height: 400px;
+        }
+
+        div:hover {
+            animation-name: changeDivColor;
+            animation-duration: 5s;
+        }
+
+        @keyframes changeDivColor {
+            0% { background-color: green; }
+            25% { background-color: yellow; }
+            50% { background-color: purple; }
+            75% { background-color: black; }
+            100% { background-color: red; }
+        }
+    </style>
+</head>
+<body>
+    <div></div>
+</body>
+</html>

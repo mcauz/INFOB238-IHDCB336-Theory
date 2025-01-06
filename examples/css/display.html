@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>CSS Display</title>
+        <style>
+            div {
+                width: 50px;
+                height: 50px;
+            }
+            .divA {
+                background-color: aliceblue;
+                border: 1px solid blue;
+            }
+            .divB {
+                background-color: darkseagreen;
+                border: 1px solid green;
+                width: auto;
+                padding: 10px;
+                margin: 10px;
+            }
+            .inline {
+                display: inline;
+            }
+            .inline-block {
+                display: inline-block;
+            }
+            .flex {
+                display: flex;
+                justify-content: space-around;
+            }
+            .inline-flex {
+                display: inline-flex;
+                justify-content: end;
+                width: 25%;
+            }
+            .grid {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                grid-gap: 10px;
+                height: auto;
+            }
+            .grid > div {
+                width: auto;
+            }
+            .c1 {
+                grid-column: 1;
+                grid-row: 1;
+            }
+            .c2 {
+                grid-column: 2 / 4;
+                grid-row: 1;
+            }
+            .c3 {
+                grid-column: 1;
+                grid-row: 2;
+            }
+            .c4 {
+                grid-column: 2;
+                grid-row: 2;
+            }
+            .c5 {
+                grid-column: 3;
+                grid-row: 2;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Display = block</h1>
+        <div class="divA"></div>
+        <div class="divA"></div>
+        <div class="divA"></div>
+
+        <h1>Display = inline</h1>
+        <div class="divA inline"></div>
+        <div class="divA inline"></div>
+        <div class="divA inline"></div>
+
+        <h1>Display = inline-block</h1>
+        <div class="divA inline-block"></div>
+        <div class="divA inline-block"></div>
+        <div class="divA inline-block"></div>
+
+        <h1>Display = flex with space-around</h1>
+        <div class="divB flex">
+            <div class="divA"></div>
+            <div class="divA"></div>
+            <div class="divA"></div>
+        </div>
+        <div class="divB flex">
+            <div class="divA"></div>
+            <div class="divA"></div>
+            <div class="divA"></div>
+        </div>
+
+        <h1>Display = inline-flex with justify-content = end</h1>
+        <div class="divB inline-flex">
+            <div class="divA"></div>
+            <div class="divA"></div>
+            <div class="divA"></div>
+        </div>
+        <div class="divB inline-flex">
+            <div class="divA"></div>
+            <div class="divA"></div>
+            <div class="divA"></div>
+        </div>
+
+        <h1>Display = grid</h1>
+        <div class="divB grid">
+            <div class="divA c1"></div>
+            <div class="divA c2"></div>
+            <div class="divA c3"></div>
+            <div class="divA c4"></div>
+            <div class="divA c5"></div>
+        </div>
+
+        <h1>Display = none</h1>
+        <div class="divA">
+            <p>1</p>
+        </div>
+        <div class="divA" style="display: none">
+            <p>2</p>
+        </div>
+        <div class="divA">
+            <p>3</p>
+        </div>
+    </body>
+</html>
