@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script>
+        function callback() {
+            console.log("Hello world !");
+        }
+
+        function callbackKey(event) {
+            document.getElementById("keyResult").innerText = `The key pressed is ${event.key}.`;
+        }
+    </script>
+</head>
+<body>
+    <button onclick="callback()">Click me</button>
+    <p id="keyResult"></p>
+</body>
+<script>
+    document.body.addEventListener("keydown", callbackKey);
+</script>
+</html>

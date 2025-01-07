@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script>
+        const h1Text = document.createTextNode("First title");
+
+        const h1 = document.createElement("h1");
+        h1.appendChild(h1Text);
+
+        const div1 = document.getElementById("firstDiv");
+        div1.appendChild(h1);
+    </script>
+</head>
+<body>
+    <div id="firstDiv"></div>
+    <div id="secondDiv"></div>
+</body>
+<script>
+    const h2Text = document.createTextNode("Second title");
+
+    const h2 = document.createElement("h2");
+    h2.appendChild(h2Text);
+
+    const p2 = document.createElement("p");
+    p2.innerText = "Paragraph 2";
+
+    const div2 = document.getElementById("secondDiv");
+    div2.appendChild(h2);
+    div2.appendChild(p2);
+</script>
+</html>

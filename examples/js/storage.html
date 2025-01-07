@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script>
+        function store() {
+            localStorage.setItem("age", document.getElementById("i1").value);
+            sessionStorage.setItem("age", document.getElementById("i2").value);
+            document.cookie = `age=${document.getElementById("i3").value};max-age=3600`;
+        }
+    </script>
+</head>
+<body>
+    <label for="i1">Age for local storage</label>
+    <input type="text" id="i1" value="18" />
+    <label for="i2">Age for session storage</label>
+    <input type="text" id="i2" value="40" />
+    <label for="i3">Age for cookies</label>
+    <input type="text" id="i3" value="60" />
+    <button onclick="store()">Store</button>
+    <hr />
+    <p id="p1"></p>
+    <p id="p2"></p>
+    <p id="p3"></p>
+</body>
+<script>
+    function getCookie(key) {
+        return document.cookie
+            .split(";")
+            .find((value) => value.startsWith(key+"="))
+            ?.split("=")[1];
+    }
+
+    document.getElementById("p1").innerText = "Age stored in local storage: " + localStorage.getItem("age");
+    document.getElementById("p2").innerText = "Age stored in session storage: " + sessionStorage.getItem("age");
+    document.getElementById("p3").innerText = "Age stored in cookies: " + getCookie("age");
+</script>
+</html>

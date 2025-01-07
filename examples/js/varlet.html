@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Var vs. Let</title>
+    <script>
+        function myVarFunction() {
+            var myVariable = 10;
+            if (true) {
+                var myVariable = 11;
+                console.log(myVariable); // print 11
+            }
+            console.log(myVariable); // print 11
+        }
+
+        function myLetFunction() {
+            let myVariable = 10;
+            if (true) {
+                let myVariable = 11;
+                console.log(myVariable); // print 11
+            }
+            console.log(myVariable); // print 10
+        }
+
+        console.log("Var function:");
+        myVarFunction();
+
+        console.log("Let function:");
+        myLetFunction();
+    </script>
+</head>
+<body>
+
+</body>
+</html>

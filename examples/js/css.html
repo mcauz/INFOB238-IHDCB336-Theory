@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .red {
+            color: red;
+        }
+        .blue {
+            color: blue;
+        }
+        .underline {
+            text-decoration: underline;
+        }
+        .box {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <p id="p1" class="red underline">First paragraph</p>
+    <p id="p2" class="blue underline">Second paragraph</p>
+</body>
+<script>
+    document.getElementById("p1").style.color = "green";
+    document.getElementById("p2").classList.remove("blue");
+    document.getElementById("p2").classList.add("box");
+</script>
+</html>

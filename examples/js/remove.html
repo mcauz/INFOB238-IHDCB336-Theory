@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <div>
+        <h1>First Title</h1>
+        <p>Paragraph 1</p>
+    </div>
+    <hr />
+    <div>
+        <h1>Second Title</h1>
+        <h1 id="p2">Paragraph 2</h1>
+    </div>
+    <hr />
+    <div id="d3">
+        <h1>Third Title</h1>
+        <h1>Paragraph 3</h1>
+    </div>
+</body>
+<script>
+    document.getElementById("p2").remove();
+    document.getElementById("d3").innerHTML = "";
+</script>
+</html>
