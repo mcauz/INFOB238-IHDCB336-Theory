@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My marketplace</title>
+</head>
+<body>
+    <header>
+        <h1>My marketplace</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="market.html">Market</a></li>
+                <li><a href="cart.html">Cart</a></li>
+                <li><a href="login.html">Login/Register</a></li>
+                <li><a>Logout</a></li>
+            </ul>
+        </nav>
+        <p>You have 30 <img src="./assets/imgs/token.png" alt="tokens" /></p>
+    </header>
+    <main>
+        <section>
+            <div>
+                Login
+                <input type="checkbox" />
+                Register
+            </div>
+            <div>
+                <p>Invalid username and/or password.</p>
+                <form method="post" action="/login">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" />
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" />
+                    <input type="submit" value="Login" />
+                    <a>Forget password ?</a>
+                </form>
+            </div>
+            <div>
+                <p>Username already used.</p>
+                <form method="post" action="/register">
+                    <label for="usernameR">Username</label>
+                    <input type="text" id="usernameR" name="username" />
+                    <label for="passwordR">Password</label>
+                    <input type="password" id="passwordR" name="password" />
+                    <input type="submit" value="Register" />
+                </form>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <p>Site created by Adibou</p>
+        <p>&#169; Copyright Adibou corporation</p>
+    </footer>
+</body>
+</html>
