@@ -1,0 +1,28 @@
+.grid {
+    display: grid;
+    grid-template-columns: repeat(4, 25%);
+    grid-gap: 10px;
+}
+
+.grid img {
+    width: 100%;
+}
+
+.flowerName {
+    font-weight: bold;
+}
+
+section div {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+section div input {
+    width: 50px;
+    margin-right: 5px;
+}
+
+section div button {
+    margin-left: 10px;
+}

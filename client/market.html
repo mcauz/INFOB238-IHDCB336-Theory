@@ -3,10 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <title>My marketplace</title>
+    <link rel="stylesheet" href="./assets/stylesheets/main.css">
+    <link rel="stylesheet" href="./assets/stylesheets/market.css">
 </head>
 <body>
     <header>
         <h1>My marketplace</h1>
+        <div class="separator"></div>
         <nav>
             <ul>
                 <li><a href="index.html">Home</a></li>
@@ -16,33 +19,31 @@
                 <li><a>Logout</a></li>
             </ul>
         </nav>
-        <p>You have 30 <img src="./assets/imgs/token.png" alt="tokens" /></p>
+        <p class="token">You have 30 <img class="token-logo" src="./assets/imgs/token.png" alt="tokens" /></p>
     </header>
     <main>
-        <section>
-            <div>
+        <div class="grid">
+            <section>
+                <img src="./assets/imgs/rose.jpeg" alt="Flower's name" />
+                <p><span class="flowerName">Flower's name</span> (Category: Red flower)</p>
+                <p>Flower's description.</p>
                 <div>
-                    <img src="./assets/imgs/rose.jpeg" alt="Flower's name" />
-                    <p>Flower's name (Category: Red flower)</p>
-                    <p>Flower's description.</p>
-                    <div>
-                        <input id="id1" type="text" />
-                        <p>/ Flower's availability</p>
-                        <button>Add to cart</button>
-                    </div>
+                    <input id="id1" type="text" />
+                    <p>/ Flower's availability</p>
+                    <button class="btn submit">Add to cart</button>
                 </div>
+            </section>
+            <section>
+                <img src="./assets/imgs/gerbera.jpeg" alt="Flower's name" />
+                <p><span class="flowerName">Flower's name</span> (Category: Red flower)</p>
+                <p>Flower's description.</p>
                 <div>
-                    <img src="./assets/imgs/gerbera.jpeg" alt="Flower's name" />
-                    <p>Flower's name (Category: Red flower)</p>
-                    <p>Flower's description.</p>
-                    <div>
-                        <input id="id2" type="text" />
-                        <p>/ Flower's availability</p>
-                        <button>Add to cart</button>
-                    </div>
+                    <input id="id2" type="text" />
+                    <p>/ Flower's availability</p>
+                    <button class="btn submit">Add to cart</button>
                 </div>
-            </div>
-        </section>
+            </section>
+        </div>
     </main>
     <footer>
         <p>Site created by Adibou</p>

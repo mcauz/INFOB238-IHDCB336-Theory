@@ -1,0 +1,33 @@
+table, tr, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+
+table {
+    width: 100%;
+}
+
+td:not(:first-child) {
+    width: 200px;
+    text-align: center;
+}
+
+th:first-child {
+    text-align: left;
+}
+
+th, td {
+    padding: 3px;
+}
+
+tr:first-child {
+    background-color: #0B4936;
+}
+
+th {
+    color: white;
+}
+
+.tr-cat {
+    background-color: #5BCAA1;
+}

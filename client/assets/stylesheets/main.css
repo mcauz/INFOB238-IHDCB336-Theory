@@ -1,0 +1,134 @@
+html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    background-color: #EAFFFC;
+    display: flex;
+    flex-direction: column;
+}
+
+/* HEADER CSS */
+
+header {
+    padding: 10px;
+    background-color: #85DBCF;
+    border-bottom: 1px solid #C3C3C3;
+    box-shadow: 0 5px 5px grey;
+    display: flex;
+    flex-direction: row;
+    position: sticky;
+    top: 0;
+}
+
+nav {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+nav ul {
+    list-style-type: none;
+    display: flex;
+    flex-direction: row;
+}
+
+nav li {
+    margin-right: 20px;
+}
+
+nav a {
+    color: black;
+    text-decoration: none;
+}
+
+nav a:hover {
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+header .token, nav a {
+    font-size: 1.2em;
+}
+
+header .token {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+header .token-logo {
+    margin-left: 5px;
+}
+
+.separator {
+    flex: 1;
+}
+
+/* MAIN CSS */
+
+main {
+    flex: 1;
+    padding: 20px 10px;
+}
+
+section {
+    border: 1px solid #c3c3c3;
+    background-color: #F3F3F3;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    padding: 10px;
+}
+
+section h2 {
+    border-bottom: 1px solid #c3c3c3;
+}
+
+
+
+/* FOOTER CSS */
+
+footer {
+    padding: 10px;
+    background-color: #85DBCF;
+    border-top: 1px solid #C3C3C3;
+}
+
+/* OTHER CSS */
+
+.token-logo {
+    width: 25px;
+}
+
+.error-message {
+    background-color: red;
+    color: white;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+.btn {
+    height: 4em;
+    border: none;
+    border-radius: 5px;
+    width: 100px;
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+.btn:hover {
+    border: 1px solid aliceblue;
+}
+
+.btn.reset {
+    background-color: grey;
+    color: white;
+}
+
+.btn.submit {
+    background-color: blue;
+    color: white;
+
+}

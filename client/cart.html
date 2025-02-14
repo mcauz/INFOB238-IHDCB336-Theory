@@ -3,10 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <title>My marketplace</title>
+    <link rel="stylesheet" href="./assets/stylesheets/main.css">
+    <link rel="stylesheet" href="./assets/stylesheets/cart.css">
 </head>
 <body>
     <header>
         <h1>My marketplace</h1>
+        <div class="separator"></div>
         <nav>
             <ul>
                 <li><a href="index.html">Home</a></li>
@@ -16,12 +19,19 @@
                 <li><a>Logout</a></li>
             </ul>
         </nav>
-        <p>You have 30 <img src="./assets/imgs/token.png" alt="tokens" /></p>
+        <p class="token">You have 30 <img class="token-logo" src="./assets/imgs/token.png" alt="tokens" /></p>
     </header>
     <main>
         <section>
             <form action="/buy" method="post">
                 <table>
+                    <tr>
+                        <th>Image</th>
+                        <th>Name</th>
+                        <th>Number selected</th>
+                        <th>Unit price</th>
+                        <th>Total price</th>
+                    </tr>
                     <tr>
                         <td><img src="./assets/imgs/rose.jpeg" alt="Flower's name" /></td>
                         <td>Flower's name</td>
@@ -29,11 +39,20 @@
                         <td>Unit price</td>
                         <td>Total price</td>
                     </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>Total price</td>
+                    </tr>
                 </table>
-                <input type="reset" value="Reset" />
-                <input type="submit" value="Buy" />
+                <div class="actions">
+                    <input class="btn reset" type="reset" value="Reset" />
+                    <input class="btn submit" type="submit" value="Buy" />
+                </div>
             </form>
-            <p>You don't have enough tokens.</p>
+            <p class="error-message">You don't have enough tokens.</p>
         </section>
     </main>
     <footer>

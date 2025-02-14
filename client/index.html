@@ -3,10 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <title>My marketplace</title>
+    <link rel="stylesheet" href="./assets/stylesheets/main.css">
+    <link rel="stylesheet" href="./assets/stylesheets/index.css">
 </head>
 <body>
     <header>
         <h1>My marketplace</h1>
+        <div class="separator"></div>
         <nav>
             <ul>
                 <li><a href="index.html">Home</a></li>
@@ -16,7 +19,7 @@
                 <li><a>Logout</a></li>
             </ul>
         </nav>
-        <p>You have 30 <img src="./assets/imgs/token.png" alt="tokens" /></p>
+        <p class="token">You have 30 <img class="token-logo" src="./assets/imgs/token.png" alt="tokens" /></p>
     </header>
     <main>
         <section>
@@ -28,16 +31,23 @@
         </section>
         <section>
             <h2>New flowers on the market:</h2>
-            <h3>Category 1</h3>
             <table>
+                <tr>
+                    <th>Name</th>
+                    <th>Availability</th>
+                    <th>Price</th>
+                </tr>
+                <tr class="tr-cat">
+                    <td colspan="3">Category 1</td>
+                </tr>
                 <tr>
                     <td>Flower's name</td>
                     <td>Flower's availability</td>
                     <td>Flower's price</td>
                 </tr>
-            </table>
-            <h3>Category 2</h3>
-            <table>
+                <tr class="tr-cat">
+                    <td colspan="3">Category 1</td>
+                </tr>
                 <tr>
                     <td>Flower's name</td>
                     <td>Flower's availability</td>
