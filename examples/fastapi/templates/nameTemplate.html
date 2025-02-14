@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Name template</title>
+</head>
+<body>
+    <p>Hello {{ name }} !</p>
+    {% if age >= 18 %}
+    <p>Take a beer !</p>
+    {% else %}
+    <p>Take a juice !</p>
+    {% endif %}
+    <hr />
+    {% for item in students %}
+    <p>Student name: {{ item }}</p>
+    {% endfor %}
+    <hr />
+    <form action="/", method="POST">
+        <label for="name">New Name</label>
+        <input type="text" id="name" name="name" placeholder="newName" />
+        <input type="submit" value="Submit" />
+    </form>
+    <hr />
+    <img src="{{ url_for('assets', path='HTML5_logo.png') }}" alt="HTML 5 logo" />
+</body>
+</html>
