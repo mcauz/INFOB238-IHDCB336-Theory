@@ -24,8 +24,8 @@
     </header>
     <main>
         <section>
-            <form action="/buy" method="post">
-                <table>
+            <table>
+                <thead>
                     <tr>
                         <th>Image</th>
                         <th>Name</th>
@@ -33,32 +33,31 @@
                         <th>Unit price</th>
                         <th>Total price</th>
                     </tr>
-                    <tr>
-                        <td><img src="./assets/imgs/rose.jpeg" alt="Flower's name" /></td>
-                        <td>Flower's name</td>
-                        <td>Number</td>
-                        <td>Unit price</td>
-                        <td>Total price</td>
-                    </tr>
+                </thead>
+                <tbody id="cart"></tbody>
+                <tfoot>
                     <tr>
                         <td></td>
                         <td></td>
                         <td></td>
                         <td></td>
-                        <td>Total price</td>
+                        <td id="total">Total price</td>
                     </tr>
-                </table>
-                <div class="actions">
-                    <button class="btn reset" onclick="store.reset()">Reset</button>
-                    <input class="btn submit" type="submit" value="Buy" />
-                </div>
-            </form>
-            <p class="error-message">You don't have enough tokens.</p>
+                </tfoot>
+            </table>
+            <div class="actions">
+                <button class="btn reset" onclick="store.reset();store.displayToTable('cart', 'total');">Reset</button>
+                <button class="btn submit" onclick="store.buy('error', 'cart', 'total');">Buy</button>
+            </div>
+            <p id="error" class="error-message">You don't have enough tokens.</p>
         </section>
     </main>
     <footer>
         <p>Site created by Adibou</p>
         <p>&#169; Copyright Adibou corporation</p>
     </footer>
+    <script>
+        store.displayToTable('cart', 'total');
+    </script>
 </body>
 </html>
