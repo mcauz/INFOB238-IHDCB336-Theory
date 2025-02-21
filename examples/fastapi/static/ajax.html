@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ajax</title>
+    <script>
+        function ajax_get() {
+            const ajax = new XMLHttpRequest();
+            ajax.open("GET", "/myResource", true);
+            ajax.onload = (event) => console.log(event.target.response);
+            ajax.onerror = (event) => console.error(event);
+            ajax.send();
+        }
+
+        function ajax_post() {
+            const ajax = new XMLHttpRequest();
+            ajax.open("POST", "/myResource", true);
+            ajax.setRequestHeader("Content-Type", "application/json");
+            ajax.onreadystatechange = () => {
+                if (ajax.readyState === XMLHttpRequest.DONE && ajax.status === 200) {
+                   console.log(ajax.response);
+                }
+            };
+            ajax.send(JSON.stringify({name: "Maxime", age: 18}));
+        }
+
+        async function fetch_get() {
+            const response = await fetch("/myResource");
+            if (response.ok) console.log(await response.json());
+            else console.error(response.status);
+        }
+
+        async function fetch_post() {
+            const data = { name: "Maxime", age: 18 };
+            const request = new Request("/myResource", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data)
+            });
+            const response = await fetch(request);
+            if (response.ok) console.log(await response.json());
+            else console.error(response.status);
+        }
+    </script>
+</head>
+<body>
+    <button onclick="ajax_get()">XMLHttpRequest (GET)</button>
+    <button onclick="ajax_post()">XMLHttpRequest (POST)</button>
+    <button onclick="fetch_get()">Fetch (GET)</button>
+    <button onclick="fetch_post()">Fetch (POST)</button>
+</body>
+</html>

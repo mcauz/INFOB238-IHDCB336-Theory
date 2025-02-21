@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WebSocket</title>
+    <script>
+        let websocket = null;
+
+        function openWS() {
+            const result = document.getElementById("result");
+            const send = document.getElementById("send");
+            const message = document.getElementById("message");
+
+            websocket = new WebSocket("ws://" + location.host + "/ws");
+            websocket.addEventListener("open", () => {
+                message.disabled = false;
+                send.disabled = false;
+            });
+            websocket.addEventListener("message", (event) => {
+                result.innerText = event.data;
+            });
+        }
+
+        function send() {
+            const message = document.getElementById("message");
+            websocket.send(message.value);
+        }
+    </script>
+</head>
+<body>
+    <button onclick="openWS()">Open socket</button>
+    <label for="message">Message to send</label>
+    <input type="text" id="message" disabled />
+    <button onclick="send()" id="send" disabled>Send</button>
+    <p id="result"></p>
+</body>
+</html>
