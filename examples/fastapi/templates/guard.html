@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Guard</title>
+    {% if token|length > 0 %}
+    <script>
+        document.cookie = 'token={{token}}';
+    </script>
+    {% endif %}
+</head>
+<body>
+    {% if token|length > 0 %}
+    <p>Token added: {{token}}</p>
+    {% endif %}
+    <form action="/" method="POST">
+        <input type="hidden" name="username" value="Maxime" />
+        <input type="submit" value="Connect" />
+    </form>
+    <a href="/auth">Go to the auth page.</a>
+</body>
+</html>
