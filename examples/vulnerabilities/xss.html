@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>XSS Vulnerability</title>
+    <script>
+        function sendResponse() {
+            const text = document.getElementById('response').value;
+            document.getElementById('forumMessage').innerHTML = text;
+        }
+
+        function populate(type) {
+          const elt = document.getElementById('response');
+          if (type === 0) elt.value = 'Test';
+          else if (type === 1) elt.value = 'Test<img src="" style="display:none" onerror="alert(\'ok\')"/>';
+          else elt.value = 'Test<img src="" style="display:none" onerror="window.location.replace(\'https://unamur.be\');"/>';
+        }
+    </script>
+</head>
+<body>
+    <h1>My great forum</h1>
+    <p>Our message is: <span id="forumMessage"></span></p>
+    <h2>Response</h2>
+    <label for="response">Message</label>
+    <textarea id="response" name="response" style="display: block;width:300px;height:100px;"></textarea>
+    <button onclick="sendResponse()">Send</button>
+    <hr />
+    <button onclick="populate(0)">Populate with correct message</button>
+    <button onclick="populate(1)">Populate with malicious message</button>
+    <button onclick="populate(2)">Populate with real malicious message</button>
+</body>
+</html>

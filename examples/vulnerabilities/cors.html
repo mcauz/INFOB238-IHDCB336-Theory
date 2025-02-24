@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CORS POLICY</title>
+    <script>
+        async function send() {
+            const response = await fetch("http://localhost:8000");
+            document.getElementById("text").innerText = (await response.json()).message;
+        }
+    </script>
+</head>
+<body>
+    <button onclick="send()">Send</button>
+    <p>The text received is: <span id="text"></span></p>
+</body>
+</html>
