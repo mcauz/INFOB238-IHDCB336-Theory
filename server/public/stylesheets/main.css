@@ -107,7 +107,13 @@ footer {
     color: white;
     border-radius: 5px;
     padding: 10px;
-    display: none;
+}
+
+.success-message {
+    background-color: green;
+    color: white;
+    border-radius: 5px;
+    padding: 10px;
 }
 
 .btn {
@@ -119,17 +125,21 @@ footer {
     cursor: pointer;
 }
 
-.btn:hover {
+.btn:not(:disabled):hover {
     border: 1px solid aliceblue;
 }
 
 .btn.reset {
-    background-color: grey;
+    background-color: red;
     color: white;
 }
 
 .btn.submit {
     background-color: blue;
     color: white;
+}
 
+.btn.submit:disabled {
+    background-color: grey;
+    cursor: not-allowed;
 }

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My marketplace</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('public', path='images/favicon.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('public', path='stylesheets/main.css') }}">
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <header>
+        <h1>My marketplace</h1>
+        <div class="separator"></div>
+        <nav>
+            <ul>
+                <li><a href="/">Home</a></li>
+                {% if is_connected %}
+                <li><a href="/market">Market</a></li>
+                <li><a href="/cart">Cart</a></li>
+                <li><a href="/logout">Logout</a></li>
+                {% else %}
+                <li><a href="/login">Login/Register</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% if is_connected %}
+        <p class="token">You have {{token}} <img class="token-logo" src="{{ url_for('public', path='images/token.png') }}" alt="tokens" /></p>
+        {% endif %}
+    </header>
+    <main>
+        {% block body %}{% endblock %}
+    </main>
+    <footer>
+        <p>Site created by Adibou</p>
+        <p>&#169; Copyright Adibou corporation</p>
+    </footer>
+</body>
+</html>

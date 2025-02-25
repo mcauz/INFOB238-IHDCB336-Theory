@@ -1,0 +1,47 @@
+{% extends "layouts/layout.html" %}
+
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('public', path='stylesheets/cart.css') }}">
+    <script type="application/javascript" src="{{ url_for('public', path='scripts/cart.js') }}"></script>
+{% endblock %}
+
+{% block body %}
+    <section>
+        <table>
+            <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>Name</th>
+                    <th>Number selected</th>
+                    <th>Unit price</th>
+                    <th>Total price</th>
+                </tr>
+            </thead>
+            <tbody id="cart"></tbody>
+            <tfoot>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td id="total">Total price</td>
+                </tr>
+            </tfoot>
+        </table>
+        <form method="post" action="/cart" id="formCart">
+            <div class="actions">
+                <button class="btn reset" onclick="store.reset();store.displayToTable('cart', 'total');">Reset</button>
+                <input type="submit" class="btn submit" value="Buy" />
+            </div>
+        </form>
+        {% if error %}
+        <p id="error" class="error-message">You don't have enough tokens.</p>
+        {% endif %}
+    </section>
+    <script>
+        {% if success %}
+        store.reset();
+        {% endif %}
+        store.displayToTable('cart', 'total', 'formCart');
+    </script>
+{% endblock %}

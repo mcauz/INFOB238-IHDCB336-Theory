@@ -1,0 +1,39 @@
+{% extends "layouts/layout.html" %}
+
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('public', path='stylesheets/home.css') }}">
+{% endblock %}
+
+{% block body %}
+    <section>
+        <h2>Welcome !</h2>
+        <p>
+            Welcome to my great marketplace. Use virtual token to buy beautiful flowers.
+            {% if not is_connected %}
+            Click <a href="login.html">here</a> to create or login to an account and start to buy.
+            {% endif %}
+        </p>
+    </section>
+    <section>
+        <h2>New flowers on the market:</h2>
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Availability</th>
+                <th>Price</th>
+            </tr>
+            {% for name, category in categories.items() %}
+            <tr class="tr-cat">
+                <td colspan="3">{{name}}</td>
+            </tr>
+            {% for flower in category %}
+            <tr>
+                <td><img src="{{ url_for('public', path='images/'+flower.image) }}" alt="{{flower.name}}"/>{{flower.name}}</td>
+                <td>{{flower.quantity}}</td>
+                <td>{{flower.unit_price}}</td>
+            </tr>
+            {% endfor %}
+            {% endfor %}
+        </table>
+    </section>
+{% endblock %}

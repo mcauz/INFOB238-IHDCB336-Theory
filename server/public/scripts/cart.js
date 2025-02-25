@@ -1,15 +1,25 @@
-const flowersInfo = {
-    f1: {
-        image: "./assets/imgs/rose.jpeg",
-        name: "Flower's name",
-        unitPrice: 10,
+const flowersInfo = [
+    {
+        image: "/public/images/gerbera.jpeg",
+        name: "Gerbera",
+        unitPrice: 1,
     },
-    f2: {
-        image: "./assets/imgs/gerbera.jpeg",
-        name: "Flower's name",
-        unitPrice: 10,
+    {
+        image: "/public/images/red-rose.jpeg",
+        name: "Red rose",
+        unitPrice: 3,
+    },
+    {
+        image: "/public/images/lily.jpeg",
+        name: "Lily",
+        unitPrice: 5,
+    },
+    {
+        image: "/public/images/daisy.jpeg",
+        name: "Daisy",
+        unitPrice: 2,
     }
-}
+]
 
 class Store {
     #items = null;
@@ -46,14 +56,14 @@ class Store {
         this.saveStore();
     }
 
-    displayToTable(tableId, totalId) {
+    displayToTable(tableId, totalId, formId) {
         const table = document.getElementById(tableId);
         table.innerHTML = "";
 
         let sum = 0;
+        let str = "";
         for (const item of this.#items) {
             const info = flowersInfo[item.id];
-            console.log(flowersInfo, item.id);
             const tr = document.createElement("tr");
 
             const tdImage = document.createElement("td");
@@ -81,23 +91,19 @@ class Store {
 
             table.appendChild(tr);
             sum += info.unitPrice * item.number;
+
+            if (str.length > 0) str += ";";
+            str += item.id + "=" + item.number;
         }
 
         document.getElementById(totalId).innerText = sum;
-    }
 
-    buy(errorId, tableId, totalId) {
-        if (this.#items.length === 0) return;
-        console.log(this.#items.reduce((acc, i) => acc += i.number * flowersInfo[i.id].unitPrice, 0));
-        if (this.#items.reduce((acc, i) => acc += i.number * flowersInfo[i.id].unitPrice, 0) > 30) {
-            const error = document.getElementById(errorId);
-            error.style.display = "block";
-            setTimeout(() => error.style.display = "none", 3000);
-            return;
-        }
-        alert("You buy flowers !");
-        this.reset();
-        this.displayToTable(tableId, totalId);
+        const input = document.createElement("input");
+        input.setAttribute("type", "hidden");
+        input.setAttribute("name", "cart");
+        input.setAttribute("value", str);
+
+        document.getElementById(formId).appendChild(input);
     }
 }
 

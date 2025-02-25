@@ -20,8 +20,6 @@ class Auth:
         self.token = ""
 
     def __call__(self, token: Annotated[str | None, Cookie()] = None):
-        print(token)
-        print(self.token)
         if token != self.token:
             raise HTTPException(status_code=401, detail="Authentication token is invalid.")
 

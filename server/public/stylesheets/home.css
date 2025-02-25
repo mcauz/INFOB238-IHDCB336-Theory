@@ -7,6 +7,11 @@ table {
     width: 100%;
 }
 
+td img {
+    height: 1em;
+    margin-right: 5px;
+}
+
 td:not(:first-child) {
     width: 200px;
     text-align: center;
