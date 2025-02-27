@@ -1,69 +1,57 @@
+import uvicorn
 from typing import Annotated
-from fastapi import FastAPI, Request, Form, status, Cookie, HTTPException
+from fastapi import FastAPI, Request, Form, status, Cookie, Depends
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from models import UserRegister, UserLogin, Cart, User
-from datetime import datetime, timedelta, timezone
-import uvicorn
-import data
-import jwt
+from sqlmodel.ext.asyncio.session import AsyncSession
+from contextlib import asynccontextmanager
+from server.database import Database
+from server.models import UserLogin, UserRegister
+from server.repositories import AuthRepository, CartRepository, FlowerRepository, UserRepository
 
-# to get a string like this run:
-# openssl rand -hex 32
-SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
+COOKIE_LIFETIME = 3600
 
-app = FastAPI()
+# Creates a connection to the database
+database = Database("./database.db")
+SessionDep = Annotated[AsyncSession, Depends(database.get_db_access)]
+
+
+# Creates and populates the database tables
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    # executes at startup
+    await database.create_db_and_tables()
+    await database.populate_db()
+    yield
+    # executes at shutdown
+
+# Creates a FastAPI application and mounts the public folder
+app = FastAPI(lifespan=lifespan)
 app.mount("/public", StaticFiles(directory="public"), name="public")
 
+# Initializes the template rendering system
 templates = Jinja2Templates(directory="templates")
 
-
-token_type = Annotated[str | None, Cookie()]
-
-
-def get_flowers_by_category():
-    categories = {}
-    for flower in data.flowers:
-        if flower.category.name not in categories:
-            categories[flower.category.name] = []
-        categories[flower.category.name].append(flower)
-    return categories
-
-
-def get_user_by_token(token):
-    if token is None:
-        return None
-
-    try:
-        # Decodes the token to retrieve the payload
-        jwt_payload = jwt.decode(token, SECRET_KEY, algorithms="HS256")
-
-        # Checks that the token matches a user
-        def compare(user):
-            return user.auth_token == token and user.username == jwt_payload["sub"]
-        return next(iter([user for user in data.users if compare(user)]), None)
-
-    except jwt.ExpiredSignatureError:
-        # Token has expired
-        return None
-
-
-def create_jwt_token(username: str, time: int):
-    to_encode = {"sub": username, "exp": datetime.now(timezone.utc) + timedelta(seconds=time)}
-    return jwt.encode(to_encode, SECRET_KEY, algorithm="HS256")
+# Creates a type to make it easier to receive the token on each route
+TokenType = Annotated[str | None, Cookie()]
 
 
 @app.get("/", response_class=HTMLResponse)
-def get_root(request: Request, token: token_type = None):
+async def get_root(request: Request, db_session: SessionDep, token: TokenType = None):
     # Retrieves the user's information from their authentication token
-    user = get_user_by_token(token)
+    auth_repository = AuthRepository(db_session)
+    user = await auth_repository.decode_authentication_token(token)
+
+    # Retrieves all categories and their flowers
+    flower_repository = FlowerRepository(db_session)
+    categories = await flower_repository.get_by_categories()
 
     # Generates the HTML page
     response = templates.TemplateResponse(request=request, name="pages/home.html", context={
         "is_connected": user is not None,
         "token": user.token if user is not None else 0,
-        "categories": get_flowers_by_category(),
+        "categories": categories,
     })
 
     # In case the token is defined but invalid, we remove the cookie
@@ -74,9 +62,10 @@ def get_root(request: Request, token: token_type = None):
 
 
 @app.get("/login", response_class=RedirectResponse)
-def get_login(request: Request, token: token_type = None):
+async def get_login(request: Request, db_session: SessionDep, token: TokenType = None):
     # Retrieves the user's information from their authentication token
-    user = get_user_by_token(token)
+    auth_repository = AuthRepository(db_session)
+    user = await auth_repository.decode_authentication_token(token)
 
     # In case the user is authenticated, we redirect them to the home page
     if user is not None:
@@ -87,45 +76,32 @@ def get_login(request: Request, token: token_type = None):
 
 
 @app.post("/login", response_class=RedirectResponse)
-def post_login(request: Request, body: Annotated[UserLogin, Form()], token: token_type = None):
-    # Retrieves the user's information from their authentication token
-    user = get_user_by_token(token)
-
-    # Checks credentials only if the user is not authenticated
-    if user is None:
-        def compare_user(user1: User):
-            return user1.username == body.username and user1.password == body.password
-        user = next(iter([u for u in data.users if compare_user(u)]), None)
-
-    # In case the authentication failed and the user is not authenticated
-    if user is None:
+async def post_login(request: Request, db_session: SessionDep, body: Annotated[UserLogin, Form()]):
+    # Checks credentials
+    auth_repository = AuthRepository(db_session)
+    if not await auth_repository.verify_authentication(body):
         return templates.TemplateResponse(request=request, name="pages/login.html", context={"login_error": True})
 
-    # In case the user is authenticated, we redirect them to the home page
+    # We create the authentication token
+    user_repository = UserRepository(db_session)
+    user = await user_repository.get_by_username(body.username)
+    user.auth_token = auth_repository.create_authentication_token(user.id)
+    await user_repository.save_user(user)
+
+    # We redirect them to the home page
     response = RedirectResponse("/", status_code=status.HTTP_303_SEE_OTHER)
-    user.auth_token = create_jwt_token(user.username, 3600)
-    response.set_cookie("token", user.auth_token, max_age=3600)
+    response.set_cookie("token", user.auth_token, max_age=COOKIE_LIFETIME)
     return response
 
 
 @app.post("/register", response_class=HTMLResponse)
-def post_register(request: Request, body: Annotated[UserRegister, Form()], token: token_type = None):
-    # Retrieves the user's information from their authentication token
-    user = get_user_by_token(token)
-
-    # In case the user is authenticated, we redirect them to the home page
-    if user is not None:
-        return RedirectResponse("/", status_code=status.HTTP_303_SEE_OTHER)
-
+async def post_register(request: Request, db_session: SessionDep, body: Annotated[UserRegister, Form()]):
     # Checks validity new user's information and adds the user to the user list in case of success
-    success = body.password == body.confirm_password and all(u.username != body.username for u in data.users)
+    user_repository = UserRepository(db_session)
+    success = await user_repository.verify_registration(body)
+
     if success:
-        ci = []
-        c = Cart(id=len(data.carts), items=ci)
-        u = User(id=len(data.users), username=body.username, password=body.password, token=300, cart=c)
-        data.cart_items.append(ci)
-        data.carts.append(c)
-        data.users.append(u)
+        await user_repository.create_user(body)
 
     # Returns the login page
     return templates.TemplateResponse(request=request, name="pages/login.html", context={
@@ -136,16 +112,28 @@ def post_register(request: Request, body: Annotated[UserRegister, Form()], token
 
 
 @app.get("/logout", response_class=RedirectResponse)
-def get_logout(request: Request):
+async def get_logout(db_session: SessionDep, token: TokenType = None):
+    # Retrieves the user's information from their authentication token
+    auth_repository = AuthRepository(db_session)
+    user = await auth_repository.decode_authentication_token(token)
+
+    # If there is an associated user to the token, we remove the token from their information
+    if user is not None:
+        user.auth_token = None
+        user_repository = UserRepository(db_session)
+        await user_repository.save_user(user)
+
+    # We redirect the client to the home page
     response = RedirectResponse("/")
     response.delete_cookie("token")
     return response
 
 
 @app.get("/market", response_class=RedirectResponse)
-def get_market(request: Request, token: token_type = None):
+async def get_market(request: Request, db_session: SessionDep, token: TokenType = None):
     # Retrieves the user's information from their authentication token
-    user = get_user_by_token(token)
+    auth_repository = AuthRepository(db_session)
+    user = await auth_repository.decode_authentication_token(token)
 
     # If the user is not authenticate, we redirect to the home page
     if user is None:
@@ -153,18 +141,23 @@ def get_market(request: Request, token: token_type = None):
         response.delete_cookie("token")
         return response
 
+    # We retrieve all the flowers
+    flower_repository = FlowerRepository(db_session)
+    flowers = await flower_repository.get_all()
+
     # We send the market page
     return templates.TemplateResponse(request=request, name="pages/market.html", context={
         "is_connected": user is not None,
         "token": user.token if user is not None else 0,
-        "flowers": data.flowers
+        "flowers": flowers
     })
 
 
 @app.get("/cart", response_class=RedirectResponse)
-def get_cart(request: Request, token: token_type = None):
+async def get_cart(request: Request, db_session: SessionDep, token: TokenType = None):
     # Retrieves the user's information from their authentication token
-    user = get_user_by_token(token)
+    auth_repository = AuthRepository(db_session)
+    user = await auth_repository.decode_authentication_token(token)
 
     # If the user is not authenticate, we redirect to the home page
     if user is None:
@@ -180,9 +173,10 @@ def get_cart(request: Request, token: token_type = None):
 
 
 @app.post("/cart", response_class=RedirectResponse)
-def get_cart(request: Request, cart: Annotated[str, Form()], token: token_type = None):
+async def get_cart(request: Request, db_session: SessionDep, cart: Annotated[str, Form()], token: TokenType = None):
     # Retrieves the user's information from their authentication token
-    user = get_user_by_token(token)
+    auth_repository = AuthRepository(db_session)
+    user = await auth_repository.decode_authentication_token(token)
 
     # If the user is not authenticate, we redirect to the home page
     if user is None:
@@ -191,34 +185,8 @@ def get_cart(request: Request, cart: Annotated[str, Form()], token: token_type =
         return response
 
     # We check the cart
-    success = True
-    items = []
-    sum = 0
-    cart_split = cart.split(";")
-    for elt in cart_split:
-        s = elt.split("=")
-        id = int(s[0])
-        number = int(s[1])
-
-        flower = [f for f in data.flowers if f.id == id]
-
-        if len(flower) == 0:
-            return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Unknown flower: " + id)
-
-        if flower[0].quantity < number:
-            success = False
-            break
-
-        items.append((flower[0], number))
-        sum += number * flower[0].unit_price
-
-    success = success and user.token >= sum
-
-    # In case of success we buy the flowers
-    if success:
-        for (flower, number) in items:
-            flower.quantity -= number
-        user.token -= sum
+    cart_repository = CartRepository(db_session)
+    success = await cart_repository.apply_cart(user, cart)
 
     # We send the market page
     return templates.TemplateResponse(request=request, name="pages/cart.html", context={
@@ -230,9 +198,10 @@ def get_cart(request: Request, cart: Annotated[str, Form()], token: token_type =
 
 
 @app.get("/{full_path:path}", response_class=HTMLResponse)
-def get_not_found(request: Request, full_path: str, token: token_type = None):
+async def get_not_found(request: Request, db_session: SessionDep, full_path: str, token: TokenType = None):
     # Retrieves the user's information from their authentication token
-    user = get_user_by_token(token)
+    auth_repository = AuthRepository(db_session)
+    user = await auth_repository.decode_authentication_token(token)
 
     # We send the market page
     return templates.TemplateResponse(request=request, name="pages/notFound.html", context={

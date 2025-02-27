@@ -22,11 +22,11 @@
                 <th>Availability</th>
                 <th>Price</th>
             </tr>
-            {% for name, category in categories.items() %}
+            {% for category in categories %}
             <tr class="tr-cat">
-                <td colspan="3">{{name}}</td>
+                <td colspan="3">{{category.name}}</td>
             </tr>
-            {% for flower in category %}
+            {% for flower in category.flowers %}
             <tr>
                 <td><img src="{{ url_for('public', path='images/'+flower.image) }}" alt="{{flower.name}}"/>{{flower.name}}</td>
                 <td>{{flower.quantity}}</td>

@@ -63,7 +63,7 @@ class Store {
         let sum = 0;
         let str = "";
         for (const item of this.#items) {
-            const info = flowersInfo[item.id];
+            const info = flowersInfo[item.id - 1];
             const tr = document.createElement("tr");
 
             const tdImage = document.createElement("td");
