@@ -1,4 +1,4 @@
-from contextlib import contextmanager
+from contextlib import asynccontextmanager
 from typing import Annotated
 from fastapi import FastAPI, Depends
 from sqlmodel import SQLModel, Field, select
@@ -28,16 +28,15 @@ async def get_session():
         yield session
 
 
-SessionDep = Annotated[AsyncSession, Depends(get_session)]
-app = FastAPI()
-
-
-@contextmanager
-async def lifespan():
+@asynccontextmanager
+async def lifespan(_: FastAPI):
     # executes at startup
     await create_db_and_tables()
     yield
     # executes at shutdown
+
+SessionDep = Annotated[AsyncSession, Depends(get_session)]
+app = FastAPI(lifespan=lifespan)
 
 
 @app.get("/")
