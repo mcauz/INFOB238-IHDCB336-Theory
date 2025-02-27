@@ -3,7 +3,6 @@
 {% block head %}
     <link rel="stylesheet" href="{{ url_for('public', path='stylesheets/market.css') }}">
     <script type="application/javascript" src="{{ url_for('public', path='scripts/form.js') }}"></script>
-    <script type="application/javascript" src="{{ url_for('public', path='scripts/cart.js') }}"></script>
 {% endblock %}
 
 {% block body %}
@@ -14,12 +13,22 @@
             <p><span class="flowerName">{{flower.name}}</span> (Category: {{flower.category.name}})</p>
             <p>{{flower.description}}</p>
             <div>
-                <input id="{{'i-'~flower.id}}" type="text" value="0" onchange="checkInputNumber('{{'i-'~flower.id}}', '{{'q-'~flower.id}}')" />
+                <input
+                        id="{{'i-'~flower.id}}"
+                        type="text"
+                        value="0"
+                        onchange="checkInputNumber({{flower.id}})"
+                />
                 <p>/ <span id="{{'q-'~flower.id}}">{{flower.quantity}}</span></p>
                 <button class="btn submit" onclick="store.addToCart({{flower.id}})">Add to cart</button>
             </div>
+            <p id="{{'info-'~flower.id}}" style="display: none">0 flower in other cart.</p>
             <p id="{{'e-'~flower.id}}" class="error-message" style="display: none">The available quantity has changed.</p>
         </section>
         {% endfor %}
     </div>
+{% endblock %}
+
+{% block endBody %}
+    <script type="application/javascript" src="{{ url_for('public', path='scripts/cart.js') }}"></script>
 {% endblock %}

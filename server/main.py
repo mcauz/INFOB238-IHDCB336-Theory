@@ -1,6 +1,6 @@
 import uvicorn
 from typing import Annotated
-from fastapi import FastAPI, Request, Form, status, Cookie, Depends
+from fastapi import FastAPI, Request, Form, status, Cookie, Depends, HTTPException, WebSocket
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -10,6 +10,7 @@ from server.database import Database
 from server.models import UserLogin, UserRegister
 from server.repositories import AuthRepository, CartRepository, FlowerRepository, UserRepository
 from server.api import create_api
+from server.websocket import WebsocketManager
 
 COOKIE_LIFETIME = 3600
 
@@ -209,6 +210,20 @@ async def get_not_found(request: Request, db_session: SessionDep, full_path: str
         "is_connected": user is not None,
         "token": user.token if user is not None else 0,
     })
+
+@app.websocket("/ws")
+async def websocket_endpoint(ws: WebSocket, db_session: SessionDep, token: TokenType = None):
+    # Retrieves the user's information from their authentication token
+    auth_repository = AuthRepository(db_session)
+    user = await auth_repository.decode_authentication_token(token)
+
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="You must be logged.")
+
+    # Accepts the connection
+    websocket_manager = WebsocketManager()
+    await websocket_manager.accept(ws)
+    await websocket_manager.listening(ws)
 
 
 if __name__ == "__main__":

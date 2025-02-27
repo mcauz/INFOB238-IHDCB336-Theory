@@ -1,8 +1,15 @@
 class Store {
     #items = null;
+    #ws = null;
 
     constructor() {
         this.#items = JSON.parse(sessionStorage.getItem("store") || "[]");
+        this.#ws = new WebSocket("ws://" + location.host + "/ws");
+
+        const close_ws = () => this.#ws = null;
+        this.#ws.addEventListener("close", close_ws);
+        this.#ws.addEventListener("error", () => console.log("error"));
+        this.#ws.addEventListener("message", (event) => this.onWebsocketMessage(JSON.parse(event.data)));
     }
 
     get items() {
@@ -30,6 +37,7 @@ class Store {
             this.saveStore();
             domElt.value = 0;
             document.getElementById(`q-${flowerId}`).innerText = flower.quantity - number;
+            await this.#ws.send(JSON.stringify({flower_id: flowerId, number}));
         } else {
             domElt.value = flower.quantity;
             document.getElementById(`q-${flowerId}`).innerText = flower.quantity;
@@ -39,9 +47,30 @@ class Store {
         }
     }
 
-    reset() {
+    async reset() {
+        const copy = this.#items;
         this.#items = [];
         this.saveStore();
+
+        for (const key in copy) {
+            await this.#ws.send(JSON.stringify({flower_id: copy[key].id, number: -copy[key].number}));
+        }
+    }
+
+    onWebsocketMessage({flower_id, number}) {
+        const elt = document.getElementById(`info-${flower_id}`);
+        if (!elt) return;
+
+        if (number === 0) {
+            elt.style.display = 'none';
+            return;
+        }
+
+        const item = this.#items.find(i => i.id === flower_id);
+        if (!!item) number -= item.number;
+
+        elt.innerText = `${number} flowers in other carts.`;
+        elt.style.display = 'block';
     }
 
     async displayToTable(tableId, totalId, formId) {
