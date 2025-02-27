@@ -9,6 +9,7 @@ from contextlib import asynccontextmanager
 from server.database import Database
 from server.models import UserLogin, UserRegister
 from server.repositories import AuthRepository, CartRepository, FlowerRepository, UserRepository
+from server.api import create_api
 
 COOKIE_LIFETIME = 3600
 
@@ -16,6 +17,8 @@ COOKIE_LIFETIME = 3600
 database = Database("./database.db")
 SessionDep = Annotated[AsyncSession, Depends(database.get_db_access)]
 
+# Creates a type to make it easier to receive the token on each route
+TokenType = Annotated[str | None, Cookie()]
 
 # Creates and populates the database tables
 @asynccontextmanager
@@ -29,12 +32,10 @@ async def lifespan(_: FastAPI):
 # Creates a FastAPI application and mounts the public folder
 app = FastAPI(lifespan=lifespan)
 app.mount("/public", StaticFiles(directory="public"), name="public")
+app.mount("/api", create_api(SessionDep, TokenType))
 
 # Initializes the template rendering system
 templates = Jinja2Templates(directory="templates")
-
-# Creates a type to make it easier to receive the token on each route
-TokenType = Annotated[str | None, Cookie()]
 
 
 @app.get("/", response_class=HTMLResponse)

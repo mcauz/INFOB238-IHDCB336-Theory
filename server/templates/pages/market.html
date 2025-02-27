@@ -14,10 +14,11 @@
             <p><span class="flowerName">{{flower.name}}</span> (Category: {{flower.category.name}})</p>
             <p>{{flower.description}}</p>
             <div>
-                <input id="{{'i-'~flower.id}}" type="text" value="0" onchange="checkInputNumber('{{'i-'~flower.id}}', {{flower.quantity}})" />
-                <p>/ {{flower.quantity}}</p>
-                <button class="btn submit" onclick="store.addToCart('{{'i-'~flower.id}}', {{flower.id}})">Add to cart</button>
+                <input id="{{'i-'~flower.id}}" type="text" value="0" onchange="checkInputNumber('{{'i-'~flower.id}}', '{{'q-'~flower.id}}')" />
+                <p>/ <span id="{{'q-'~flower.id}}">{{flower.quantity}}</span></p>
+                <button class="btn submit" onclick="store.addToCart({{flower.id}})">Add to cart</button>
             </div>
+            <p id="{{'e-'~flower.id}}" class="error-message" style="display: none">The available quantity has changed.</p>
         </section>
         {% endfor %}
     </div>

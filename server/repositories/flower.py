@@ -50,6 +50,22 @@ class FlowerRepository:
         """
         return await self.__flower_dao.read_all()
 
+    async def get_one(self, flower_id: int) -> Flower | None:
+        """
+        Gets one flower by id.
+
+        Parameters
+        ----------
+        flower_id: int
+            ID of the flower.
+
+        Returns
+        -------
+        Flower | None
+            The flower specified by the id, or None if no flower exists.
+        """
+        return await self.__flower_dao.read_one(flower_id)
+
     async def get_by_categories(self) -> list[CategoryExt]:
         """
         Gets flowers by categories.
