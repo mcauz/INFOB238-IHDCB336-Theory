@@ -8,7 +8,7 @@ class Store {
 
         const close_ws = () => this.#ws = null;
         this.#ws.addEventListener("close", close_ws);
-        this.#ws.addEventListener("error", () => console.log("error"));
+        this.#ws.addEventListener("error", close_ws);
         this.#ws.addEventListener("message", (event) => this.onWebsocketMessage(JSON.parse(event.data)));
     }
 
@@ -52,9 +52,15 @@ class Store {
         this.#items = [];
         this.saveStore();
 
-        for (const key in copy) {
-            await this.#ws.send(JSON.stringify({flower_id: copy[key].id, number: -copy[key].number}));
+        const ws = this.#ws;
+        async function send() {
+            for (const key in copy) {
+                await ws.send(JSON.stringify({flower_id: copy[key].id, number: -copy[key].number}));
+            }
         }
+
+        if (this.#ws.readyState !== 1) this.#ws.addEventListener("open", send);
+        else await send();
     }
 
     onWebsocketMessage({flower_id, number}) {
