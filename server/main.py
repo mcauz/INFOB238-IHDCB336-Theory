@@ -1,11 +1,15 @@
 import uvicorn
 from typing import Annotated
 from fastapi import FastAPI, Request, Form, status, Cookie, Depends, WebSocket
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from fastapi_csrf_protect import CsrfProtect
+from fastapi_csrf_protect.exceptions import CsrfProtectError
 from sqlmodel.ext.asyncio.session import AsyncSession
 from contextlib import asynccontextmanager
+from markupsafe import escape
+from pydantic_settings import BaseSettings
 from server.database import Database
 from server.models import UserLogin, UserRegister, User
 from server.repositories import AuthRepository, CartRepository, FlowerRepository, UserRepository
@@ -21,6 +25,7 @@ SessionDep = Annotated[AsyncSession, Depends(database.get_db_access)]
 
 # Creates a type to make it easier to receive the token on each route
 TokenType = Annotated[str | None, Cookie()]
+
 
 # Creates and populates the database tables
 @asynccontextmanager
@@ -43,6 +48,20 @@ templates = Jinja2Templates(directory="templates")
 auth_guard = create_auth_interceptor(SessionDep)
 
 
+# Load CSRF security
+class CSRF_Security(BaseSettings):
+    secret_key: str = "mySecretKey"
+    cookie_samesite: str = "none"
+    cookie_secure: bool = True
+    token_location: str = "body"
+    token_key: str = "csrf-token"
+
+
+@CsrfProtect.load_config
+def get_csrf_config():
+    return CSRF_Security()
+
+
 @app.get("/", response_class=HTMLResponse)
 async def get_root(request: Request, db_session: SessionDep, user: User | None = Depends(auth_guard.get_user)):
     # Retrieves all categories and their flowers
@@ -60,16 +79,37 @@ async def get_root(request: Request, db_session: SessionDep, user: User | None =
 
 
 @app.get("/login", response_class=RedirectResponse, dependencies=[Depends(auth_guard.redirect_if_auth)])
-async def get_login(request: Request, db_session: SessionDep):
-    return templates.TemplateResponse(request=request, name="pages/login.html", context={})
+async def get_login(request: Request, csrf_protect: CsrfProtect = Depends()):
+    csrf_token, signed_token = csrf_protect.generate_csrf_tokens()
+    response = templates.TemplateResponse(request=request, name="pages/login.html", context={"csrf_token": csrf_token})
+    csrf_protect.set_csrf_cookie(signed_token, response)
+    return response
 
 
 @app.post("/login", response_class=RedirectResponse)
-async def post_login(request: Request, db_session: SessionDep, body: Annotated[UserLogin, Form()]):
+async def post_login(
+        request: Request,
+        db_session: SessionDep,
+        body: Annotated[UserLogin, Form()],
+        csrf_protect: CsrfProtect = Depends()
+):
+    # CSRF vulnerability
+    await csrf_protect.validate_csrf(request)
+
+    # XSS vulnerability
+    body.username = escape(body.username)
+    body.password = escape(body.password)
+
     # Checks credentials
     auth_repository = AuthRepository(db_session)
     if not await auth_repository.verify_authentication(body):
-        return templates.TemplateResponse(request=request, name="pages/login.html", context={"login_error": True})
+        csrf_token, signed_token = csrf_protect.generate_csrf_tokens()
+        response = templates.TemplateResponse(request=request, name="pages/login.html", context={
+            "login_error": True,
+            "csrf_token": csrf_token
+        })
+        csrf_protect.set_csrf_cookie(signed_token, response)
+        return response
 
     # We create the authentication token
     user_repository = UserRepository(db_session)
@@ -80,11 +120,24 @@ async def post_login(request: Request, db_session: SessionDep, body: Annotated[U
     # We redirect them to the home page
     response = RedirectResponse("/", status_code=status.HTTP_303_SEE_OTHER)
     response.set_cookie("token", user.auth_token, max_age=COOKIE_LIFETIME)
+    csrf_protect.unset_csrf_cookie(response)
     return response
 
 
 @app.post("/register", response_class=HTMLResponse)
-async def post_register(request: Request, db_session: SessionDep, body: Annotated[UserRegister, Form()]):
+async def post_register(
+        request: Request,
+        db_session: SessionDep,
+        body: Annotated[UserRegister, Form()],
+        csrf_protect: CsrfProtect = Depends()
+):
+    # CSRF vulnerability
+    await csrf_protect.validate_csrf(request)
+
+    # XSS vulnerability
+    body.username = escape(body.username)
+    body.password = escape(body.password)
+
     # Checks validity new user's information and adds the user to the user list in case of success
     user_repository = UserRepository(db_session)
     success = await user_repository.verify_registration(body)
@@ -93,11 +146,15 @@ async def post_register(request: Request, db_session: SessionDep, body: Annotate
         await user_repository.create_user(body)
 
     # Returns the login page
-    return templates.TemplateResponse(request=request, name="pages/login.html", context={
+    csrf_token, signed_token = csrf_protect.generate_csrf_tokens()
+    response = templates.TemplateResponse(request=request, name="pages/login.html", context={
         "register_page": not success,
         "register_succeed": success,
-        "register_error": not success
+        "register_error": not success,
+        "csrf_token": csrf_token
     })
+    csrf_protect.set_csrf_cookie(signed_token, response)
+    return response
 
 
 @app.get("/logout", response_class=RedirectResponse)
@@ -140,6 +197,9 @@ async def get_cart(request: Request):
 
 @app.post("/cart", response_class=RedirectResponse, dependencies=[Depends(auth_guard.redirect_auth)])
 async def get_cart(request: Request, db_session: SessionDep, cart: Annotated[str, Form()]):
+    # XSS Vulnerabilities
+    cart = escape(cart)
+
     # We check the cart
     user = request.state.user
     cart_repository = CartRepository(db_session)
@@ -167,6 +227,11 @@ async def websocket_endpoint(ws: WebSocket):
     websocket_manager = WebsocketManager()
     await websocket_manager.accept(ws)
     await websocket_manager.listening(ws)
+
+
+@app.exception_handler(CsrfProtectError)
+def csrf_protect_exception_handler(request: Request, exc: CsrfProtectError):
+    return JSONResponse(status_code=exc.status_code, content={"detail": exc.message})
 
 
 if __name__ == "__main__":

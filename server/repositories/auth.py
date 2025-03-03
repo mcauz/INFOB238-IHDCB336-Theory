@@ -63,7 +63,7 @@ class AuthRepository:
             jwt_payload = jwt.decode(token, AUTH_SECRET_KEY, algorithms=AUTH_ALGORITHM)
             user = await self.__user_dao.read_one(int(jwt_payload["sub"]))
             return user if user is not None and user.auth_token == token else None
-        except jwt.ExpiredSignatureError:
+        except:
             return None
 
     def hash_password(self, password: str) -> str:

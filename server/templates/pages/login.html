@@ -38,6 +38,7 @@
                 <input type="text" id="username" name="username" />
                 <label for="password">Password</label>
                 <input type="password" id="password" name="password" />
+                <input type='hidden' name='csrf-token' value="{{ csrf_token }}"/>
                 <input class="btn submit" type="submit" value="Login" />
                 <a href="" onclick="alert('You are a loser !')">Forget password ?</a>
             </form>
@@ -53,6 +54,7 @@
                 <input type="password" id="passwordR" name="password" onkeyup="checkPassword()" />
                 <label for="confirmPasswordR">Confirm password</label>
                 <input type="password" id="confirmPasswordR" name="confirm_password" onkeyup="checkPassword()" />
+                <input type='hidden' name='csrf-token' value="{{ csrf_token }}"/>
                 <input id="registerBtn" class="btn submit" type="submit" value="Register" disabled />
             </form>
         </div>
