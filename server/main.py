@@ -4,6 +4,7 @@ from fastapi import FastAPI, Request, Form, status, Cookie, Depends, WebSocket
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi_csrf_protect import CsrfProtect
 from fastapi_csrf_protect.exceptions import CsrfProtectError
 from sqlmodel.ext.asyncio.session import AsyncSession
@@ -40,6 +41,18 @@ async def lifespan(_: FastAPI):
 app = FastAPI(lifespan=lifespan)
 app.mount("/public", StaticFiles(directory="public"), name="public")
 app.mount("/api", create_api(SessionDep, TokenType))
+
+# Add CORS Policy
+origins = [
+    "*",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
 
 # Initializes the template rendering system
 templates = Jinja2Templates(directory="templates")
