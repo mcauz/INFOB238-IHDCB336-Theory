@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My reactive web site</title>
+    <script>
+        class MyComponent {
+            constructor(text) {
+                const thisArg = this;
+                this.state = {
+                    hiddenField: {text},
+
+                    get text() { return this.hiddenField.text; },
+
+                    set text(value) {
+                        this.hiddenField.text = value;
+                        thisArg.update_dom();
+                    }
+                };
+            }
+
+            update_dom() {
+                document.body.innerHTML = `
+                    <p>${this.state.text}</p>
+                    <div>
+                        <input type="text" id="input" value="My updated text" />
+                        <button onclick="component.change_text()">Change text</button>
+                    </div>
+                `;
+            }
+
+            change_text() {
+                this.state.text = document.getElementById("input").value;
+            }
+        }
+
+        const component = new MyComponent("My initial text");
+        window.addEventListener("load", () => component.update_dom());
+    </script>
+</head>
+<body>
+
+</body>
+</html>
