@@ -1,5 +1,9 @@
+from typing import TYPE_CHECKING
 from sqlmodel import SQLModel, Field, Relationship
-from server.models.flower import Flower
+
+# This condition is to prevent error in editor due to circular import
+if TYPE_CHECKING:
+    from server.models.flower import Flower
 
 
 class BaseCategory(SQLModel):
@@ -46,3 +50,7 @@ class CategoryExt(BaseCategory):
         List of all flowers belonging to the category.
     """
     flowers: list["Flower"]
+
+
+from server.models.flower import Flower
+CategoryExt.update_forward_refs()

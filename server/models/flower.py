@@ -6,7 +6,7 @@ if TYPE_CHECKING:
     from server.models.category import Category
 
 
-class Flower(SQLModel, table=True):
+class BaseFlower(SQLModel):
     """
     Models of the Flower table in the database.
 
@@ -26,12 +26,7 @@ class Flower(SQLModel, table=True):
         Description of the flower.
     category_id: int
         Identifier of the category to which the flower belongs.
-    category : Category
-        Information on the category to which the flower belongs. This is not a column of the table in the database.
     """
-
-    __tablename__ = 'Flower'
-
     id: int | None = Field(default=None, primary_key=True)
     name: str = Field(nullable=False, min_length=1)
     image: str = Field(nullable=False, min_length=1)
@@ -39,7 +34,29 @@ class Flower(SQLModel, table=True):
     quantity: int = Field(nullable=False)
     description: str = Field(default="No description.")
     category_id: int = Field(foreign_key="Category.id")
+
+
+class Flower(BaseFlower, table=True):
+    """
+    Models of the Flower table in the database.
+
+    Attributes
+    ----------
+    category : Category
+        Information on the category to which the flower belongs. This is not a column of the table in the database.
+    """
+
+    __tablename__ = 'Flower'
+
     category: "Category" = Relationship(
         back_populates="flowers",
         sa_relationship_kwargs={'lazy': 'joined'}
     )
+
+
+class FlowerExt(BaseFlower):
+    category: "Category"
+
+
+from server.models.category import Category
+FlowerExt.update_forward_refs()

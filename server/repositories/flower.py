@@ -1,5 +1,5 @@
 from sqlmodel.ext.asyncio.session import AsyncSession
-from server.models import Category, CategoryExt, Flower
+from server.models import Category, CategoryExt, Flower, FlowerExt
 from server.daos import CategoryDAO, FlowerDAO
 
 
@@ -48,7 +48,8 @@ class FlowerRepository:
         list[Flower]
             List of all flowers.
         """
-        return await self.__flower_dao.read_all()
+        flowers = await self.__flower_dao.read_all()
+        return [FlowerExt.model_validate(flower) for flower in flowers]
 
     async def get_one(self, flower_id: int) -> Flower | None:
         """
@@ -64,7 +65,7 @@ class FlowerRepository:
         Flower | None
             The flower specified by the id, or None if no flower exists.
         """
-        return await self.__flower_dao.read_one(flower_id)
+        return FlowerExt.model_validate(await self.__flower_dao.read_one(flower_id))
 
     async def get_by_categories(self) -> list[CategoryExt]:
         """

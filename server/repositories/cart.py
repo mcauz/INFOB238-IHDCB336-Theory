@@ -1,5 +1,5 @@
 from sqlmodel.ext.asyncio.session import AsyncSession
-from server.models import User
+from server.models import User, CartItem
 from server.daos import UserDAO, FlowerDAO
 
 
@@ -18,7 +18,7 @@ class CartRepository:
         self.__user_dao = UserDAO(db_session)
         self.__flower_dao = FlowerDAO(db_session)
 
-    async def apply_cart(self, user: User, cart: str) -> bool:
+    async def apply_cart(self, user: User, cart: list[CartItem]) -> bool:
         """
         Removes sold flowers from stock and reduces the number of tokens held by the customer. If the customer does not
         have enough tokens, or if there is not enough flower in stock, the operation is cancelled.
@@ -27,7 +27,7 @@ class CartRepository:
         ----------
         user : User
             The user that buy the cart.
-        cart : str
+        cart : dict[int, int]
             The cart containing the type and number of flowers to buy.
 
         Returns
@@ -40,26 +40,21 @@ class CartRepository:
         str
             Human-readable error message when a flower is unknown.
         """
-        # Parses the cart content
-        cart_split = cart.split(";")
-
         # Parses each item, retrieves the flower and check the quantity
         flowers = []
         total = 0
-        for item in cart_split:
-            flower_id, flower_number = item.split("=")
-            flower_number = int(flower_number)
-            flower = await self.__flower_dao.read_one(flower_id)
+        for item in cart:
+            flower = await self.__flower_dao.read_one(item.id)
             flowers.append(flower)
 
             if flower is None:
-                raise f"Unknown flower: {flower_id}"
+                raise f"Unknown flower: {item.id}"
 
-            if flower.quantity < flower_number:
+            if flower.quantity < item.number:
                 return False
 
-            flower.quantity -= flower_number
-            total += flower_number * flower.unit_price
+            flower.quantity -= item.number
+            total += item.number * flower.unit_price
 
         # Check the number of user's tokens
         if user.token < total:
