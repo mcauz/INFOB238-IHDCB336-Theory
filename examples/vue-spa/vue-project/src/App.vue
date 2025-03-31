@@ -1,14 +1,17 @@
 <script setup>
+import { ref } from "vue"
 import { RouterLink, RouterView } from 'vue-router'
 import HelloWorld from './components/HelloWorld.vue'
+
+let myInput = ref(0);
 </script>
 
 <template>
   <header>
     <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
-
+    <input type="text" v-model="myInput" />
     <div class="wrapper">
-      <HelloWorld msg="You did it!" />
+      <HelloWorld :msg="myInput" />
 
       <nav>
         <RouterLink to="/">Home</RouterLink>
